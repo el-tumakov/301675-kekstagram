@@ -8,7 +8,6 @@ var COMMENTS = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-
 var DESCRIPTION = [
   'Тестим новую камеру!',
   'Затусили с друзьями на море',
@@ -17,17 +16,20 @@ var DESCRIPTION = [
   'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......',
   'Вот это тачка!'
 ];
-
-var photos = []; // массив с данными о фотографиях
 var COUNT_PHOTOS = 25;
 var MIN_LIKES = 15;
 var MAX_LIKES = 200;
 var COUNT_COMMENTS = 2;
+var BIG_PHOTO_NUMBER = 0;
+var MIN_COMMENTS = 15;
+var MAX_COMMENTS = 100;
+var MIN_AVATAR_NUMBER = 1;
+var MAX_AVATAR_NUMBER = 6;
 
 /**
  * Функция нахождения рандомного элемента в массиве.
- * @param {Array} arr
- * @return {string}
+ * @param {Array} arr - вводим массив
+ * @return {string} - возвращаем элемент массива
  */
 var getRandomElementArray = function (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -35,9 +37,9 @@ var getRandomElementArray = function (arr) {
 
 /**
  * Функция нахождения рандомного числа в заданном отрезке.
- * @param {number} min
- * @param {number} max
- * @return {number}
+ * @param {number} min - минимальный диапазон рандома
+ * @param {number} max - максимальный диапазон рандома
+ * @return {number} - рандомное число
  */
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -50,10 +52,11 @@ var getRandomInt = function (min, max) {
  */
 var coinToss = function () {
   return Math.floor(Math.random() * 2);
-}
+};
+
 
 /**
- * В этой части кода я прогоняю по циклу фотографии.
+ * Генерация случайных комментариев для фотографий.
  */
 var commentsPhoto = [];
 for (var i = 0; i < COUNT_PHOTOS; i++) {
@@ -84,11 +87,17 @@ for (var i = 0; i < COUNT_PHOTOS; i++) {
       }
     }
   } else {
-      commentsPhoto[i] = [randomComment]
+    commentsPhoto[i] = [randomComment];
   }
 }
 
-for (var i = 0; i < COUNT_PHOTOS; i++) {
+
+/**
+ * Генерация массива с данными о фотографиях
+ */
+var photos = [];
+
+for (i = 0; i < COUNT_PHOTOS; i++) {
   photos[i] = {
     url: 'photos/' + (i + 1) + '.jpg',
     likes: getRandomInt(MIN_LIKES, MAX_LIKES),
@@ -97,59 +106,91 @@ for (var i = 0; i < COUNT_PHOTOS; i++) {
   };
 }
 
-var template = document.querySelector('#picture').content.querySelector('.picture__link');
+
+/**
+ * Блок добавления маленьких фотографий на главную
+ */
+var templatePhoto = document.querySelector('#picture').content.querySelector('.picture__link');
 
 /**
  * Функция генерирования фотографии из массива
- * @param {Array} arr
- * @return {string}
+ * @param {Array} pictures - массив объектов с данными о фотографиях
+ * @return {string} - возвращаем DOM ноду маленькой фотографии
  */
-var renderPhoto = function (arr) {
-  var picture = template.cloneNode(true);
+var renderPhoto = function (pictures) {
+  var picture = templatePhoto.cloneNode(true);
 
   var pictureImg = picture.querySelector('.picture__img');
   var pictureLikes = picture.querySelector('.picture__stat--likes');
   var pictureComments = picture.querySelector('.picture__stat--comments');
 
-  pictureImg.src = arr.url;
-  pictureLikes.textContent = arr.likes;
-  pictureComments.textContent = arr.comments;
+  pictureImg.src = pictures.url;
+  pictureLikes.textContent = pictures.likes;
+  pictureComments.textContent = pictures.comments;
 
   return picture;
 };
 
-var fragment = document.createDocumentFragment();
+var fragmentPhoto = document.createDocumentFragment();
 var picturesDiv = document.querySelector('.pictures');
 
 for (i = 0; i < photos.length; i++) {
-  fragment.appendChild(renderPhoto(photos[i]));
+  fragmentPhoto.appendChild(renderPhoto(photos[i]));
 }
 
-picturesDiv.appendChild(fragment);
+picturesDiv.appendChild(fragmentPhoto);
 
+
+/**
+ * Блок с большой фотографией
+ */
 var bigPicture = document.querySelector('.big-picture');
 var bigPictureImg = document.querySelector('.big-picture__img img');
 var bigPictureLike = document.querySelector('.likes-count');
-var bigPictureComments = document.querySelectorAll('.social__comment');
 var bigPictureCommentsCount = document.querySelector('.comments-count');
-var bigPictureAvatar;
-var BIG_PHOTO_NUMBER = 0;
-var MIN_COMMENTS = 15;
-var MAX_COMMENTS = 100;
-var MIN_AVATAR_NUMBER = 1;
-var MAX_AVATAR_NUMBER = 6;
 
 bigPicture.classList.remove('hidden');
 bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
 bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
 bigPictureCommentsCount.textContent = getRandomInt(MIN_COMMENTS, MAX_COMMENTS);
 
-for (i = 0; i < bigPictureComments.length; i++) {
-  bigPictureAvatar = bigPictureComments[i].querySelector('.social__picture');
+
+/**
+ * Блок с добавлением комментариев из массива данных на сайт
+ */
+var bigPictureCommentsList = document.querySelector('.social__comments');
+var templateComment = document.querySelector('.social__comment');
+
+/**
+ * Функция генерации ноды комментария
+ * @param {Array} commentaryes - двумерный массив с комментариями,
+ * @return {Array} - возвращаем DOM ноду комментария
+ */
+var renderComment = function (commentaryes) {
+  var commentary = templateComment.cloneNode(true);
+  var bigPictureAvatar = commentary.querySelector('.social__picture');
 
   bigPictureAvatar.src = 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
-  bigPictureComments[i].lastChild.textContent = photos[BIG_PHOTO_NUMBER].comments;
+  commentary.lastChild.textContent = commentaryes;
+
+  return commentary;
+};
+
+var fragmentPictureComment = document.createDocumentFragment();
+
+for (i = 0; i < commentsPhoto[BIG_PHOTO_NUMBER].length; i++) {
+  fragmentPictureComment.appendChild(renderComment(commentsPhoto[BIG_PHOTO_NUMBER][i]));
 }
+
+/**
+ * Удаление стандартных комментариев и добавление сгенерированных в DOM
+ */
+while (bigPictureCommentsList.firstChild) {
+  bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
+}
+
+bigPictureCommentsList.appendChild(fragmentPictureComment);
+
 
 var socialCommentsCount = document.querySelector('.social__comment-count');
 var socialCommentsLoadmore = document.querySelector('.social__comment-loadmore');
