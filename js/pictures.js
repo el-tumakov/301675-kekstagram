@@ -34,12 +34,13 @@ var getRandomElementArray = function (arr) {
 
 /**
  * Функция нахождения рандомного числа в заданном отрезке.
- * @param {number, mumber} mix max
+ * @param {number} min
+ * @param {number} max
  * @return {number}
  */
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+};
 
 for (var i = 0; i < COUNT_PHOTOS; i++) {
   photos[i] = {
@@ -54,19 +55,19 @@ var template = document.querySelector('#picture').content.querySelector('.pictur
 
 /**
  * Функция генерирования фотографии из массива
- * @param {Array} photos
+ * @param {Array} arr
  * @return {string}
  */
-var renderPhoto = function (photos) {
+var renderPhoto = function (arr) {
   var picture = template.cloneNode(true);
 
   var pictureImg = picture.querySelector('.picture__img');
   var pictureLikes = picture.querySelector('.picture__stat--likes');
   var pictureComments = picture.querySelector('.picture__stat--comments');
 
-  pictureImg.src = photos.url;
-  pictureLikes.textContent = photos.likes;
-  pictureComments.textContent = photos.comments;
+  pictureImg.src = arr.url;
+  pictureLikes.textContent = arr.likes;
+  pictureComments.textContent = arr.comments;
 
   return picture;
 };
