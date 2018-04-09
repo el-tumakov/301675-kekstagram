@@ -22,6 +22,7 @@ var photos = []; // массив с данными о фотографиях
 var COUNT_PHOTOS = 25;
 var MIN_LIKES = 15;
 var MAX_LIKES = 200;
+var COUNT_COMMENTS = 2;
 
 /**
  * Функция нахождения рандомного элемента в массиве.
@@ -42,11 +43,56 @@ var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+/**
+ * Функция подбрасывания монетки.
+ * Возвращает true или false.
+ * @return {boolean}
+ */
+var coinToss = function () {
+  return Math.floor(Math.random() * 2);
+}
+
+/**
+ * В этой части кода я прогоняю по циклу фотографии.
+ */
+var commentsPhoto = [];
+for (var i = 0; i < COUNT_PHOTOS; i++) {
+  commentsPhoto[i] = [];
+  var randomComment = getRandomElementArray(COMMENTS);
+  /**
+   * Если при подбросе монетки будет true - у фотографии два комментария, если false - один.
+   */
+  if (coinToss()) {
+    /**
+     * Цикл, который присваивает рандомные комментарии из базы.
+     * При этом происходит проверка на повторяющийся комментарий.
+     * Если такой коммент уже был, то он его отбрасывает и берет другой.
+     */
+    while (commentsPhoto[i].length < COUNT_COMMENTS) {
+      randomComment = getRandomElementArray(COMMENTS);
+      var found = false;
+
+      for (var j = 0; j < commentsPhoto[i].length; j++) {
+        if (commentsPhoto[i][j] === randomComment) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        commentsPhoto[i][commentsPhoto[i].length] = randomComment;
+      }
+    }
+  } else {
+      commentsPhoto[i] = [randomComment]
+  }
+}
+
 for (var i = 0; i < COUNT_PHOTOS; i++) {
   photos[i] = {
     url: 'photos/' + (i + 1) + '.jpg',
     likes: getRandomInt(MIN_LIKES, MAX_LIKES),
-    comments: getRandomElementArray(COMMENTS),
+    comments: [commentsPhoto[i]],
     description: getRandomElementArray(DESCRIPTION)
   };
 }
