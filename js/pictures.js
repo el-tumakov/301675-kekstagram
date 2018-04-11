@@ -1,0 +1,199 @@
+'use strict';
+
+var COMMENTS = [
+  'Всё отлично!',
+  'В целом всё неплохо. Но не всё.',
+  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
+var DESCRIPTION = [
+  'Тестим новую камеру!',
+  'Затусили с друзьями на море',
+  'Как же круто тут кормят',
+  'Отдыхаем...',
+  'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......',
+  'Вот это тачка!'
+];
+var COUNT_PHOTOS = 25;
+var MIN_LIKES = 15;
+var MAX_LIKES = 200;
+var COUNT_COMMENTS = 2;
+var BIG_PHOTO_NUMBER = 0;
+var MIN_COMMENTS = 15;
+var MAX_COMMENTS = 100;
+var MIN_AVATAR_NUMBER = 1;
+var MAX_AVATAR_NUMBER = 6;
+
+/**
+ * Функция нахождения рандомного элемента в массиве.
+ * @param {Array} arr - вводим массив
+ * @return {string} - возвращаем элемент массива
+ */
+var getRandomElementArray = function (arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+/**
+ * Функция нахождения рандомного числа в заданном отрезке.
+ * @param {number} min - минимальный диапазон рандома
+ * @param {number} max - максимальный диапазон рандома
+ * @return {number} - рандомное число
+ */
+var getRandomInt = function (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+/**
+ * Функция подбрасывания монетки.
+ * Возвращает true или false.
+ * @return {boolean}
+ */
+var coinToss = function () {
+  return Math.floor(Math.random() * 2);
+};
+
+
+/**
+ * Генерация случайных комментариев для фотографий.
+ */
+var commentsPhoto = [];
+for (var i = 0; i < COUNT_PHOTOS; i++) {
+  commentsPhoto[i] = [];
+  var randomComment = getRandomElementArray(COMMENTS);
+  /**
+   * Если при подбросе монетки будет true - у фотографии два комментария, если false - один.
+   */
+  if (coinToss()) {
+    /**
+     * Цикл, который присваивает рандомные комментарии из базы.
+     * При этом происходит проверка на повторяющийся комментарий.
+     * Если такой коммент уже был, то он его отбрасывает и берет другой.
+     */
+    while (commentsPhoto[i].length < COUNT_COMMENTS) {
+      randomComment = getRandomElementArray(COMMENTS);
+      var found = false;
+
+      for (var j = 0; j < commentsPhoto[i].length; j++) {
+        if (commentsPhoto[i][j] === randomComment) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        commentsPhoto[i][commentsPhoto[i].length] = randomComment;
+      }
+    }
+  } else {
+    commentsPhoto[i] = [randomComment];
+  }
+}
+
+
+/**
+ * Генерация массива с данными о фотографиях
+ */
+var photos = [];
+
+for (i = 0; i < COUNT_PHOTOS; i++) {
+  photos[i] = {
+    url: 'photos/' + (i + 1) + '.jpg',
+    likes: getRandomInt(MIN_LIKES, MAX_LIKES),
+    comments: [commentsPhoto[i]],
+    description: getRandomElementArray(DESCRIPTION)
+  };
+}
+
+
+/**
+ * Блок добавления маленьких фотографий на главную
+ */
+var templatePhoto = document.querySelector('#picture').content.querySelector('.picture__link');
+
+/**
+ * Функция генерирования фотографии из массива
+ * @param {Array} pictures - массив объектов с данными о фотографиях
+ * @return {string} - возвращаем DOM ноду маленькой фотографии
+ */
+var renderPhoto = function (pictures) {
+  var picture = templatePhoto.cloneNode(true);
+
+  var pictureImg = picture.querySelector('.picture__img');
+  var pictureLikes = picture.querySelector('.picture__stat--likes');
+  var pictureComments = picture.querySelector('.picture__stat--comments');
+
+  pictureImg.src = pictures.url;
+  pictureLikes.textContent = pictures.likes;
+  pictureComments.textContent = pictures.comments;
+
+  return picture;
+};
+
+var fragmentPhoto = document.createDocumentFragment();
+var picturesDiv = document.querySelector('.pictures');
+
+for (i = 0; i < photos.length; i++) {
+  fragmentPhoto.appendChild(renderPhoto(photos[i]));
+}
+
+picturesDiv.appendChild(fragmentPhoto);
+
+
+/**
+ * Блок с большой фотографией
+ */
+var bigPicture = document.querySelector('.big-picture');
+var bigPictureImg = document.querySelector('.big-picture__img img');
+var bigPictureLike = document.querySelector('.likes-count');
+var bigPictureCommentsCount = document.querySelector('.comments-count');
+
+bigPicture.classList.remove('hidden');
+bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
+bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
+bigPictureCommentsCount.textContent = getRandomInt(MIN_COMMENTS, MAX_COMMENTS);
+
+
+/**
+ * Блок с добавлением комментариев из массива данных на сайт
+ */
+var bigPictureCommentsList = document.querySelector('.social__comments');
+var templateComment = document.querySelector('.social__comment');
+
+/**
+ * Функция генерации ноды комментария
+ * @param {Array} commentaryes - двумерный массив с комментариями,
+ * @return {Array} - возвращаем DOM ноду комментария
+ */
+var renderComment = function (commentaryes) {
+  var commentary = templateComment.cloneNode(true);
+  var bigPictureAvatar = commentary.querySelector('.social__picture');
+
+  bigPictureAvatar.src = 'img/avatar-' + getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
+  commentary.lastChild.textContent = commentaryes;
+
+  return commentary;
+};
+
+var fragmentPictureComment = document.createDocumentFragment();
+
+for (i = 0; i < commentsPhoto[BIG_PHOTO_NUMBER].length; i++) {
+  fragmentPictureComment.appendChild(renderComment(commentsPhoto[BIG_PHOTO_NUMBER][i]));
+}
+
+/**
+ * Удаление стандартных комментариев и добавление сгенерированных в DOM
+ */
+while (bigPictureCommentsList.firstChild) {
+  bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
+}
+
+bigPictureCommentsList.appendChild(fragmentPictureComment);
+
+
+var socialCommentsCount = document.querySelector('.social__comment-count');
+var socialCommentsLoadmore = document.querySelector('.social__comment-loadmore');
+
+socialCommentsCount.classList.add('visually-hidden');
+socialCommentsLoadmore.classList.add('visually-hidden');
