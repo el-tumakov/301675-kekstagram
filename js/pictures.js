@@ -146,14 +146,27 @@ picturesDiv.appendChild(fragmentPhoto);
 /**
  * Блок с большой фотографией
  */
+var picturesImg = document.querySelectorAll('.picture__img');
 var bigPicture = document.querySelector('.big-picture');
 var bigPictureImg = document.querySelector('.big-picture__img img');
 var bigPictureLike = document.querySelector('.likes-count');
 var bigPictureCommentsCount = document.querySelector('.comments-count');
 
+var getPhotoInfo = function (index) {
+  bigPicture.classList.remove('hidden');
+
+    bigPictureImg.src = photos[index].url;
+    bigPictureLike.textContent = photos[index].likes;
+};
+
+for (i = 0; i < picturesImg.length; i++) {
+  picturesImg[i].addEventListener('click', function () {
+    getPhotoInfo(i);
+  });
+}
 // bigPicture.classList.remove('hidden');
-bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
-bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
+// bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
+// bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
 bigPictureCommentsCount.textContent = getRandomInt(MIN_COMMENTS, MAX_COMMENTS);
 
 
@@ -208,6 +221,10 @@ var pictureEditor = document.querySelector('.img-upload__overlay');
 var pictureUploadInput = document.querySelector('#upload-file');
 var resizeValue = document.querySelector('.resize__control--value');
 
+/**
+ * Обработчик события при загрузке фотографии.
+ * Открывает попап с редактором фотографии.
+ */
 var pictureUploadInputChangeHandler = function () {
   resizeValue.value = '100%';
   pictureEditor.classList.remove('hidden');
@@ -222,12 +239,20 @@ pictureUploadInput.addEventListener('change', pictureUploadInputChangeHandler);
  */
 var pictureEditorCancel = document.querySelector('.img-upload__cancel');
 
+/**
+ * Обработчик события нажатия кливиши при открытом попапе редактора фотографии.
+ * При нажатии на ESC закрывает попап.
+ */
 var onPictureEditorEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     pictureEditorCancelClickHandler();
   }
 };
 
+/**
+ * Обработчик события при клике на крест в попапе.
+ * Закрывает попап.
+ */
 var pictureEditorCancelClickHandler = function () {
   pictureUploadInput.value = '';
   pictureEditor.classList.add('hidden');
@@ -248,6 +273,11 @@ var picturePreview = document.querySelector('.img-upload__preview img');
 resizeWrap.setAttribute('style', 'z-index: 1');
 picturePreview.setAttribute('style', 'transform: scale(1)');
 
+/**
+ * Обработчик события при клике на уменьшение масштаба.
+ * Уменьшает масштаб с шагом в 25%.
+ * Максимум 100%.
+ */
 var resizeMinusClickHandler = function () {
   if (!(resizeValue.value === '25%')) {
 
@@ -256,6 +286,11 @@ var resizeMinusClickHandler = function () {
   }
 };
 
+/**
+ * Обработчик события при клике на увеличение масштаба.
+ * Увеличивает масштаб с шагом в 25%.
+ * Максимум 100%.
+ */
 var resizePlusClickHandler = function () {
   if (!(resizeValue.value === '100%')) {
     resizeValue.value = Number(resizeValue.value.replace(/%/gi, '')) + 25 + '%';
@@ -266,7 +301,75 @@ var resizePlusClickHandler = function () {
 resizeMinus.addEventListener('click', resizeMinusClickHandler);
 resizePlus.addEventListener('click', resizePlusClickHandler);
 
+
+/**
+ * Добавление эффектов к фотографиям.
+ */
+var effects = document.querySelectorAll('.effects__radio');
+var scale = document.querySelector('.scale');
+var scalePin = document.querySelector('.scale__pin');
+var scaleValue = document.querySelector('.scale__value');
+var scaleLine = document.querySelector('.scale__line');
+var scaleLevel = document.querySelector('.scale__level');
+
+effects[0].checked = 'checked';
+scale.classList.add('visually-hidden');
+scalePin.setAttribute('style', 'left: 100%');
+scaleLevel.setAttribute('style', 'width: 100%');
+
+/**
+ * Функция расчетов уровня насыщенности эффектов.
+ */
+var getEffectLevel = function () {
+  var scaleValue = scaleLevel.style.width.replace(/%/, '');
+
+  if (picturePreview.className === 'effects__preview--none' || picturePreview.className === '') {
+    picturePreview.style.filter = '';
+  }
+  if (picturePreview.className === 'effects__preview--chrome') {
+    picturePreview.style.filter = 'grayscale(' + (scaleValue / 100) + ')'
+  }
+  if (picturePreview.className === 'effects__preview--sepia') {
+    picturePreview.style.filter = 'sepia(' + (scaleValue / 100) + ')'
+  }
+  if (picturePreview.className === 'effects__preview--marvin') {
+    picturePreview.style.filter = 'invert(' + scaleValue + '%)'
+  }
+  if (picturePreview.className === 'effects__preview--phobos') {
+    picturePreview.style.filter = 'blur(' + (scaleValue * 3 / 100) + 'px)'
+  }
+  if (picturePreview.className === 'effects__preview--heat') {
+    picturePreview.style.filter = 'brightness(' + (scaleValue * 2 / 100 + 1) + ')'
+  }
+};
+/**
+ * Обработчик события при клике на эффект.
+ * Меняет наложенный эффект на фотографии.
+ */
+var effectsClickHandler = function () {
+  for (i = 0; i < effects.length; i ++) {
+    if (effects[i].checked) {
+      picturePreview.className = '';
+      picturePreview.classList.add('effects__preview--' + effects[i].value);
+      scaleLevel.style.width = '100%';
+    }
+  }
+
+  if (effects[0].checked) {
+    scale.classList.add('visually-hidden');
+  } else {
+    scale.classList.remove('visually-hidden')
+  }
+
+  getEffectLevel();
+};
+
+for (i = 0; i < effects.length; i++) {
+  effects[i].addEventListener('click', effectsClickHandler);
+}
+
 /**
  * Полузнок регулирования интенсиновсти эффекта в редакторе фотографии.
  */
-var scalePin = document.querySelector('.scale__pin');
+
+scalePin.addEventListener('mouseup', getEffectLevel);
