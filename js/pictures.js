@@ -25,6 +25,8 @@ var MIN_COMMENTS = 15;
 var MAX_COMMENTS = 100;
 var MIN_AVATAR_NUMBER = 1;
 var MAX_AVATAR_NUMBER = 6;
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 /**
  * Функция нахождения рандомного элемента в массиве.
@@ -149,7 +151,7 @@ var bigPictureImg = document.querySelector('.big-picture__img img');
 var bigPictureLike = document.querySelector('.likes-count');
 var bigPictureCommentsCount = document.querySelector('.comments-count');
 
-bigPicture.classList.remove('hidden');
+// bigPicture.classList.remove('hidden');
 bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
 bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
 bigPictureCommentsCount.textContent = getRandomInt(MIN_COMMENTS, MAX_COMMENTS);
@@ -197,3 +199,74 @@ var socialCommentsLoadmore = document.querySelector('.social__comment-loadmore')
 
 socialCommentsCount.classList.add('visually-hidden');
 socialCommentsLoadmore.classList.add('visually-hidden');
+
+
+/**
+ * Показ формы редактирования нового изображения.
+ */
+var pictureEditor = document.querySelector('.img-upload__overlay');
+var pictureUploadInput = document.querySelector('#upload-file');
+var resizeValue = document.querySelector('.resize__control--value');
+
+var pictureUploadInputChangeHandler = function () {
+  resizeValue.value = '100%';
+  pictureEditor.classList.remove('hidden');
+  document.addEventListener('keydown', onPictureEditorEscPress);
+};
+
+pictureUploadInput.addEventListener('change', pictureUploadInputChangeHandler);
+
+
+/**
+ * Закрытие формы редактирования нового изображения.
+ */
+var pictureEditorCancel = document.querySelector('.img-upload__cancel');
+
+var onPictureEditorEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    pictureEditorCancelClickHandler();
+  }
+};
+
+var pictureEditorCancelClickHandler = function () {
+  pictureUploadInput.value = '';
+  pictureEditor.classList.add('hidden');
+  document.removeEventListener('keydown', onPictureEditorEscPress);
+};
+
+pictureEditorCancel.addEventListener('click', pictureEditorCancelClickHandler);
+
+
+/**
+ * Регулирование масшатаба изображения в редакторе фотографии.
+ */
+var resizeWrap = document.querySelector('.img-upload__resize');
+var resizeMinus = document.querySelector('.resize__control--minus');
+var resizePlus = document.querySelector('.resize__control--plus');
+var picturePreview = document.querySelector('.img-upload__preview img');
+
+resizeWrap.setAttribute('style', 'z-index: 1');
+picturePreview.setAttribute('style', 'transform: scale(1)');
+
+var resizeMinusClickHandler = function () {
+  if (!(resizeValue.value === '25%')) {
+
+    resizeValue.value = resizeValue.value.replace(/%/gi, '') - 25 + '%';
+    picturePreview.style.transform = 'scale(' + (picturePreview.style.transform.replace(/[^.0-9]/gim, '') - 0.25) + ')';
+  }
+};
+
+var resizePlusClickHandler = function () {
+  if (!(resizeValue.value === '100%')) {
+    resizeValue.value = Number(resizeValue.value.replace(/%/gi, '')) + 25 + '%';
+    picturePreview.style.transform = 'scale(' + (Number(picturePreview.style.transform.replace(/[^.0-9]/gim, '')) + 0.25) + ')';
+  }
+};
+
+resizeMinus.addEventListener('click', resizeMinusClickHandler);
+resizePlus.addEventListener('click', resizePlusClickHandler);
+
+/**
+ * Полузнок регулирования интенсиновсти эффекта в редакторе фотографии.
+ */
+var scalePin = document.querySelector('.scale__pin');
