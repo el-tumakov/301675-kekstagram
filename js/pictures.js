@@ -20,18 +20,25 @@ var COUNT_PHOTOS = 25;
 var MIN_LIKES = 15;
 var MAX_LIKES = 200;
 var COUNT_COMMENTS = 2;
-var BIG_PHOTO_NUMBER = 0;
 var MIN_COMMENTS = 15;
 var MAX_COMMENTS = 100;
 var MIN_AVATAR_NUMBER = 1;
 var MAX_AVATAR_NUMBER = 6;
 var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+var RESIZE_MAX = '100%';
+var RESIZE_MIN = '25%';
+var RESIZE_STEP = 25;
+var SCALE_STEP = 0.25;
+var CHECKED_EFFECT = 0;
+var BLUR_MAX_VALUE = 3;
+var BRIGHTNESS_MAX_VALUE = 2;
+var BRIGHTNESS_STEP = 1;
+var MAX_FILTER_VALUE_PERCENT = 100;
 
 /**
  * Функция нахождения рандомного элемента в массиве.
- * @param {Array} arr - вводим массив
- * @return {string} - возвращаем элемент массива
+ * @param {Array} arr - вводим массив.
+ * @return {string} - возвращаем элемент массива.
  */
 var getRandomElementArray = function (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -39,9 +46,9 @@ var getRandomElementArray = function (arr) {
 
 /**
  * Функция нахождения рандомного числа в заданном отрезке.
- * @param {number} min - минимальный диапазон рандома
- * @param {number} max - максимальный диапазон рандома
- * @return {number} - рандомное число
+ * @param {number} min - минимальный диапазон рандома.
+ * @param {number} max - максимальный диапазон рандома.
+ * @return {number} - рандомное число.
  */
 var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -95,7 +102,7 @@ for (var i = 0; i < COUNT_PHOTOS; i++) {
 
 
 /**
- * Генерация массива с данными о фотографиях
+ * Генерация массива с данными о фотографиях.
  */
 var photos = [];
 
@@ -110,14 +117,14 @@ for (i = 0; i < COUNT_PHOTOS; i++) {
 
 
 /**
- * Блок добавления маленьких фотографий на главную
+ * Блок добавления маленьких фотографий на главную.
  */
 var templatePhoto = document.querySelector('#picture').content.querySelector('.picture__link');
 
 /**
- * Функция генерирования фотографии из массива
- * @param {Array} pictures - массив объектов с данными о фотографиях
- * @return {string} - возвращаем DOM ноду маленькой фотографии
+ * Функция генерирования фотографии из массива.
+ * @param {Array} pictures - массив объектов с данными о фотографиях.
+ * @return {string} - возвращаем DOM ноду маленькой фотографии.
  */
 var renderPhoto = function (pictures) {
   var picture = templatePhoto.cloneNode(true);
@@ -144,42 +151,32 @@ picturesDiv.appendChild(fragmentPhoto);
 
 
 /**
- * Блок с большой фотографией
+ * Блок с показом большой фотографии.
  */
-var picturesImg = document.querySelectorAll('.picture__img');
+var bodyElement = document.querySelector('body');
+var picturesLink = document.querySelectorAll('.picture__link');
 var bigPicture = document.querySelector('.big-picture');
 var bigPictureImg = document.querySelector('.big-picture__img img');
 var bigPictureLike = document.querySelector('.likes-count');
 var bigPictureCommentsCount = document.querySelector('.comments-count');
+var bigPictureCancel = document.querySelector('.big-picture__cancel');
+var socialCommentsCount = document.querySelector('.social__comment-count');
+var socialCommentsLoadmore = document.querySelector('.social__comment-loadmore');
 
-var getPhotoInfo = function (index) {
-  bigPicture.classList.remove('hidden');
-
-    bigPictureImg.src = photos[index].url;
-    bigPictureLike.textContent = photos[index].likes;
-};
-
-for (i = 0; i < picturesImg.length; i++) {
-  picturesImg[i].addEventListener('click', function () {
-    getPhotoInfo(i);
-  });
-}
-// bigPicture.classList.remove('hidden');
-// bigPictureImg.src = photos[BIG_PHOTO_NUMBER].url;
-// bigPictureLike.textContent = photos[BIG_PHOTO_NUMBER].likes;
 bigPictureCommentsCount.textContent = getRandomInt(MIN_COMMENTS, MAX_COMMENTS);
-
+socialCommentsCount.classList.add('visually-hidden');
+socialCommentsLoadmore.classList.add('visually-hidden');
 
 /**
- * Блок с добавлением комментариев из массива данных на сайт
+ * Добавление комментариев из массива данных на сайт.
  */
 var bigPictureCommentsList = document.querySelector('.social__comments');
 var templateComment = document.querySelector('.social__comment');
 
 /**
- * Функция генерации ноды комментария
- * @param {Array} commentaryes - двумерный массив с комментариями,
- * @return {Array} - возвращаем DOM ноду комментария
+ * Функция генерации ноды комментария.
+ * @param {Array} commentaryes - двумерный массив с комментариями.
+ * @return {Array} - возвращаем DOM ноду комментария.
  */
 var renderComment = function (commentaryes) {
   var commentary = templateComment.cloneNode(true);
@@ -193,25 +190,62 @@ var renderComment = function (commentaryes) {
 
 var fragmentPictureComment = document.createDocumentFragment();
 
-for (i = 0; i < commentsPhoto[BIG_PHOTO_NUMBER].length; i++) {
-  fragmentPictureComment.appendChild(renderComment(commentsPhoto[BIG_PHOTO_NUMBER][i]));
-}
+/**
+ * Обработчик клика на маленькую фотографию.
+ * Открывает большую фотографию и присваивает данных о фото из массива photos.
+ */
+var picturesDivClickHandler = function () {
+  var target = event.target;
+  var parentTarget = target.parentNode;
+  var targetNumber = Array.prototype.indexOf.call(picturesLink, parentTarget);
+
+  if (target.className === 'picture__img') {
+    bigPicture.classList.remove('hidden');
+    bigPictureImg.src = target.src;
+    bigPictureLike.textContent = photos[targetNumber + 1].likes;
+
+    /**
+     * Генерирование комментариев для выбранной фотографии.
+     */
+    for (i = 0; i < commentsPhoto[targetNumber].length; i++) {
+      fragmentPictureComment.appendChild(renderComment(commentsPhoto[targetNumber][i]));
+    }
+
+    /**
+     * Удаление стандартных комментариев и добавление сгенерированных в DOM.
+     */
+    while (bigPictureCommentsList.firstChild) {
+      bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
+    }
+
+    bigPictureCommentsList.appendChild(fragmentPictureComment);
+
+    bodyElement.classList.add('modal-open');
+
+    document.addEventListener('keydown', bigPictureKeydownHandler);
+  }
+};
+
+picturesDiv.addEventListener('click', picturesDivClickHandler);
 
 /**
- * Удаление стандартных комментариев и добавление сгенерированных в DOM
+ * Обработчик события нажатия клавиши при открытой большой фотографии.
+ * При нажати на ESC закрывает фотографию.
+ * @param {Object} evt - event.
  */
-while (bigPictureCommentsList.firstChild) {
-  bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
-}
+var bigPictureKeydownHandler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    bigPictureCancelClickHandler();
+  }
+};
 
-bigPictureCommentsList.appendChild(fragmentPictureComment);
+var bigPictureCancelClickHandler = function () {
+  bigPicture.classList.add('hidden');
+  bodyElement.classList.remove('modal-open');
+  document.removeEventListener('keydown', bigPictureKeydownHandler);
+};
 
-
-var socialCommentsCount = document.querySelector('.social__comment-count');
-var socialCommentsLoadmore = document.querySelector('.social__comment-loadmore');
-
-socialCommentsCount.classList.add('visually-hidden');
-socialCommentsLoadmore.classList.add('visually-hidden');
+bigPictureCancel.addEventListener('click', bigPictureCancelClickHandler);
 
 
 /**
@@ -226,9 +260,9 @@ var resizeValue = document.querySelector('.resize__control--value');
  * Открывает попап с редактором фотографии.
  */
 var pictureUploadInputChangeHandler = function () {
-  resizeValue.value = '100%';
+  resizeValue.value = RESIZE_MAX;
   pictureEditor.classList.remove('hidden');
-  document.addEventListener('keydown', onPictureEditorEscPress);
+  document.addEventListener('keydown', pictureEditorKeydownHandler);
 };
 
 pictureUploadInput.addEventListener('change', pictureUploadInputChangeHandler);
@@ -242,8 +276,9 @@ var pictureEditorCancel = document.querySelector('.img-upload__cancel');
 /**
  * Обработчик события нажатия кливиши при открытом попапе редактора фотографии.
  * При нажатии на ESC закрывает попап.
+ * @param {Object} evt - event.
  */
-var onPictureEditorEscPress = function (evt) {
+var pictureEditorKeydownHandler = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     pictureEditorCancelClickHandler();
   }
@@ -256,7 +291,7 @@ var onPictureEditorEscPress = function (evt) {
 var pictureEditorCancelClickHandler = function () {
   pictureUploadInput.value = '';
   pictureEditor.classList.add('hidden');
-  document.removeEventListener('keydown', onPictureEditorEscPress);
+  document.removeEventListener('keydown', pictureEditorKeydownHandler);
 };
 
 pictureEditorCancel.addEventListener('click', pictureEditorCancelClickHandler);
@@ -274,15 +309,26 @@ resizeWrap.setAttribute('style', 'z-index: 1');
 picturePreview.setAttribute('style', 'transform: scale(1)');
 
 /**
- * Обработчик события при клике на уменьшение масштаба.
- * Уменьшает масштаб с шагом в 25%.
- * Максимум 100%.
+ * Функция изменения масштаба фотографии.
+ * @param {boolean} minus - для уменьшения масшатаба.
+ * @param {boolean} plus - для увеличения масштаба.
  */
-var resizeMinusClickHandler = function () {
-  if (!(resizeValue.value === '25%')) {
+var changeResizeValue = function (minus, plus) {
+  var resizeValueNumber = Number(resizeValue.value.replace(/%/gi, ''));
+  var resizeScaleNumber = Number(picturePreview.style.transform.replace(/[^.0-9]/gim, ''));
 
-    resizeValue.value = resizeValue.value.replace(/%/gi, '') - 25 + '%';
-    picturePreview.style.transform = 'scale(' + (picturePreview.style.transform.replace(/[^.0-9]/gim, '') - 0.25) + ')';
+  if (minus) {
+    if (!(resizeValue.value === RESIZE_MIN)) {
+      resizeValue.value = resizeValueNumber - RESIZE_STEP + '%';
+      picturePreview.style.transform = 'scale(' + (resizeScaleNumber - SCALE_STEP) + ')';
+    }
+  }
+
+  if (plus) {
+    if (!(resizeValue.value === RESIZE_MAX)) {
+      resizeValue.value = resizeValueNumber + RESIZE_STEP + '%';
+      picturePreview.style.transform = 'scale(' + (resizeScaleNumber + SCALE_STEP) + ')';
+    }
   }
 };
 
@@ -291,11 +337,12 @@ var resizeMinusClickHandler = function () {
  * Увеличивает масштаб с шагом в 25%.
  * Максимум 100%.
  */
+var resizeMinusClickHandler = function () {
+  changeResizeValue(true, false);
+};
+
 var resizePlusClickHandler = function () {
-  if (!(resizeValue.value === '100%')) {
-    resizeValue.value = Number(resizeValue.value.replace(/%/gi, '')) + 25 + '%';
-    picturePreview.style.transform = 'scale(' + (Number(picturePreview.style.transform.replace(/[^.0-9]/gim, '')) + 0.25) + ')';
-  }
+  changeResizeValue(false, true);
 };
 
 resizeMinus.addEventListener('click', resizeMinusClickHandler);
@@ -309,10 +356,9 @@ var effects = document.querySelectorAll('.effects__radio');
 var scale = document.querySelector('.scale');
 var scalePin = document.querySelector('.scale__pin');
 var scaleValue = document.querySelector('.scale__value');
-var scaleLine = document.querySelector('.scale__line');
 var scaleLevel = document.querySelector('.scale__level');
 
-effects[0].checked = 'checked';
+effects[CHECKED_EFFECT].checked = 'checked';
 scale.classList.add('visually-hidden');
 scalePin.setAttribute('style', 'left: 100%');
 scaleLevel.setAttribute('style', 'width: 100%');
@@ -321,33 +367,40 @@ scaleLevel.setAttribute('style', 'width: 100%');
  * Функция расчетов уровня насыщенности эффектов.
  */
 var getEffectLevel = function () {
-  var scaleValue = scaleLevel.style.width.replace(/%/, '');
+  var scaleValueNumber = scaleLevel.style.width.replace(/%/, '');
+  var filterGrayscale = (scaleValueNumber / MAX_FILTER_VALUE_PERCENT);
+  var filterSepia = (scaleValueNumber / MAX_FILTER_VALUE_PERCENT);
+  var filterBlur = (scaleValueNumber * BLUR_MAX_VALUE / MAX_FILTER_VALUE_PERCENT);
+  var filterBrightness = (scaleValueNumber * BRIGHTNESS_MAX_VALUE / MAX_FILTER_VALUE_PERCENT + BRIGHTNESS_STEP);
 
   if (picturePreview.className === 'effects__preview--none' || picturePreview.className === '') {
     picturePreview.style.filter = '';
   }
   if (picturePreview.className === 'effects__preview--chrome') {
-    picturePreview.style.filter = 'grayscale(' + (scaleValue / 100) + ')'
+    picturePreview.style.filter = 'grayscale(' + filterGrayscale + ')';
   }
   if (picturePreview.className === 'effects__preview--sepia') {
-    picturePreview.style.filter = 'sepia(' + (scaleValue / 100) + ')'
+    picturePreview.style.filter = 'sepia(' + filterSepia + ')';
   }
   if (picturePreview.className === 'effects__preview--marvin') {
-    picturePreview.style.filter = 'invert(' + scaleValue + '%)'
+    picturePreview.style.filter = 'invert(' + scaleValueNumber + '%)';
   }
   if (picturePreview.className === 'effects__preview--phobos') {
-    picturePreview.style.filter = 'blur(' + (scaleValue * 3 / 100) + 'px)'
+    picturePreview.style.filter = 'blur(' + filterBlur + 'px)';
   }
   if (picturePreview.className === 'effects__preview--heat') {
-    picturePreview.style.filter = 'brightness(' + (scaleValue * 2 / 100 + 1) + ')'
+    picturePreview.style.filter = 'brightness(' + filterBrightness + ')';
   }
+
+  scaleValue.setAttribute('value', scaleValueNumber);
 };
+
 /**
  * Обработчик события при клике на эффект.
  * Меняет наложенный эффект на фотографии.
  */
 var effectsClickHandler = function () {
-  for (i = 0; i < effects.length; i ++) {
+  for (i = 0; i < effects.length; i++) {
     if (effects[i].checked) {
       picturePreview.className = '';
       picturePreview.classList.add('effects__preview--' + effects[i].value);
@@ -355,10 +408,10 @@ var effectsClickHandler = function () {
     }
   }
 
-  if (effects[0].checked) {
+  if (effects[CHECKED_EFFECT].checked) {
     scale.classList.add('visually-hidden');
   } else {
-    scale.classList.remove('visually-hidden')
+    scale.classList.remove('visually-hidden');
   }
 
   getEffectLevel();
