@@ -17,6 +17,9 @@
   var effects = document.querySelectorAll('.effects__radio');
   var picturePreview = document.querySelector('.img-upload__preview img');
   var scale = document.querySelector('.scale');
+  var scalePin = document.querySelector('.scale__pin');
+  var scaleValue = document.querySelector('.scale__value');
+  var scaleLevel = document.querySelector('.scale__level');
 
   /**
    * Обработчик события при загрузке фотографии.
@@ -46,6 +49,9 @@
     picturePreview.style = '';
     picturePreview.className = '';
     pictureEditor.classList.add('hidden');
+    scaleValue.setAttribute('value', '');
+    scalePin.style = '';
+    scaleLevel.style = '';
     scale.classList.add('visually-hidden');
     document.removeEventListener('keydown', pictureEditorKeydownHandler);
   };

@@ -2,6 +2,8 @@
 
 (function () {
   var CHECKED_EFFECT = 0;
+  var MIN_EFFECT_LEVEL = 0;
+  var MAX_EFFECT_LEVEL = 100;
   var BLUR_MAX_VALUE = 3;
   var BRIGHTNESS_MAX_VALUE = 2;
   var BRIGHTNESS_STEP = 1;
@@ -13,6 +15,7 @@
   var picturePreview = document.querySelector('.img-upload__preview img');
   var effects = document.querySelectorAll('.effects__radio');
   var scale = document.querySelector('.scale');
+  var scaleLine = document.querySelector('.scale__line');
   var scalePin = document.querySelector('.scale__pin');
   var scaleValue = document.querySelector('.scale__value');
   var scaleLevel = document.querySelector('.scale__level');
@@ -63,6 +66,7 @@
         picturePreview.className = '';
         picturePreview.classList.add('effects__preview--' + effects[i].value);
         scaleLevel.style.width = '100%';
+        scalePin.style.left = '100%';
       }
     }
 
@@ -80,8 +84,60 @@
   }
 
   /**
-   * Полузнок регулирования интенсиновсти эффекта в редакторе фотографии.
+   * Слайдер уровня эффекта.
+   * Координата задается в пределах от 0% до 100% отступа слева от родительского блока.
+   * @param {Object} evt - event.
+   * @param {string} elem - элемент, который хотим перетащить.
+   * @param {string} parent - родитель элемента. Для контроля выхода за границы.
+   * @param {string} elemLevel - уровень накладываемого эффекта.
    */
+  var dragSlider = function (evt, elem, parent, elemLevel) {
+    evt.preventDefault();
 
-  scalePin.addEventListener('mouseup', getEffectLevel);
+    var startCoords = {
+      x: evt.clientX
+    };
+
+    /**
+     * Обработчик перемещения указателя мыши.
+     * При условии, что при перемещении элемент не выйдет за границы родителя - перемещает элемент.
+     * Получает конечный уровень эффекта и применяет эффект.
+     * @param {Object} moveEvt - event.
+     */
+    var mousemoveHandler = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX
+      };
+
+      startCoords = {
+        x: moveEvt.clientX
+      };
+
+      var elementShift = elem.offsetLeft - shift.x;
+
+      if (elementShift <= parent.offsetWidth && elementShift >= MIN_EFFECT_LEVEL) {
+        elem.style.left = (elementShift * MAX_EFFECT_LEVEL / parent.offsetWidth) + '%';
+        elemLevel.style.width = elem.style.left;
+        getEffectLevel();
+      }
+    };
+
+    var mouseupHandler = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', mousemoveHandler);
+      document.removeEventListener('mouseup', mouseupHandler);
+    };
+
+    document.addEventListener('mousemove', mousemoveHandler);
+    document.addEventListener('mouseup', mouseupHandler);
+  };
+
+  var scalePinMousedownHandler = function (evt) {
+    dragSlider(evt, scalePin, scaleLine, scaleLevel);
+  };
+
+  scalePin.addEventListener('mousedown', scalePinMousedownHandler);
 })();
