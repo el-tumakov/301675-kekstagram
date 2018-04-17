@@ -254,7 +254,7 @@ var bigPictureKeydownHandler = function (evt) {
  */
 var bigPictureCancelClickHandler = function () {
   closeBigPicture();
-}
+};
 
 bigPictureCancel.addEventListener('click', bigPictureCancelClickHandler);
 
@@ -314,7 +314,7 @@ var pictureEditorKeydownHandler = function (evt) {
  */
 var pictureEditorCancelClickHandler = function () {
   closePictureEditor();
-}
+};
 
 pictureEditorCancel.addEventListener('click', pictureEditorCancelClickHandler);
 
