@@ -229,21 +229,32 @@ var picturesDivClickHandler = function () {
 picturesDiv.addEventListener('click', picturesDivClickHandler);
 
 /**
+ * Закрывает окно с большой фотографией.
+ */
+var closeBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  bodyElement.classList.remove('modal-open');
+  document.removeEventListener('keydown', bigPictureKeydownHandler);
+};
+
+/**
  * Обработчик события нажатия клавиши при открытой большой фотографии.
  * При нажати на ESC закрывает фотографию.
  * @param {Object} evt - event.
  */
 var bigPictureKeydownHandler = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
-    bigPictureCancelClickHandler();
+    closeBigPicture();
   }
 };
 
+/**
+ * Обработчик клика по кнопке закрытия окна с большой фотографией.
+ * Закрывает окно.
+ */
 var bigPictureCancelClickHandler = function () {
-  bigPicture.classList.add('hidden');
-  bodyElement.classList.remove('modal-open');
-  document.removeEventListener('keydown', bigPictureKeydownHandler);
-};
+  closeBigPicture();
+}
 
 bigPictureCancel.addEventListener('click', bigPictureCancelClickHandler);
 
@@ -278,25 +289,32 @@ pictureUploadInput.addEventListener('change', pictureUploadInputChangeHandler);
 var pictureEditorCancel = document.querySelector('.img-upload__cancel');
 
 /**
+ * Закрывает окно редактора фотографии.
+ */
+var closePictureEditor = function () {
+  pictureUploadInput.value = '';
+  pictureEditor.classList.add('hidden');
+  document.removeEventListener('keydown', pictureEditorKeydownHandler);
+};
+
+/**
  * Обработчик события нажатия кливиши при открытом попапе редактора фотографии.
  * При нажатии на ESC закрывает попап.
  * @param {Object} evt - event.
  */
 var pictureEditorKeydownHandler = function (evt) {
   if (evt.keyCode === ESC_KEYCODE && !(inputHashTag === document.activeElement) && !(inputComment === document.activeElement)) {
-    pictureEditorCancelClickHandler();
+    closePictureEditor();
   }
 };
 
 /**
- * Обработчик события при клике на крест в попапе.
- * Закрывает попап.
+ * Обработчик клика на кнопку закрытия окна редактора.
+ * Закрывает окно.
  */
 var pictureEditorCancelClickHandler = function () {
-  pictureUploadInput.value = '';
-  pictureEditor.classList.add('hidden');
-  document.removeEventListener('keydown', pictureEditorKeydownHandler);
-};
+  closePictureEditor();
+}
 
 pictureEditorCancel.addEventListener('click', pictureEditorCancelClickHandler);
 
