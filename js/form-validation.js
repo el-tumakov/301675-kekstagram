@@ -1,71 +1,146 @@
 'use strict';
 
 (function () {
-  var formSubmit = document.querySelector('.img-upload__submit');
+  var ERRORS = [
+    'Хэш-тег должен начинаться с символа - #.',
+    'Хэш-тег не может состоять только из одной решетки.',
+    'Хэш-теги должны разделяться пробелами.',
+    'Один и тот же хэш-тег не может быть использован дважды.',
+    'Нельзя указывать больше пяти хэш-тегов.',
+    'Длина одного хэш-тега не должна превышать 20 символов (включая #).'
+  ];
+
+  var formWrap = document.querySelector('.text');
+  var inputHashTag = document.querySelector('.text__hashtags');
+
+  var fragmentErrors = document.createDocumentFragment();
+  var errorsList = document.createElement('ul');
+
+  fragmentErrors.appendChild(errorsList);
+
+  errorsList.classList.add('visually-hidden');
+  errorsList.style.textAlign = 'left';
+  errorsList.style.fontStyle = 'italic';
+  errorsList.style.textTransform = 'none';
+  errorsList.style.listStyle = 'none';
+  errorsList.style.color = 'lightgreen';
+
+  for (var i = 0; i < ERRORS.length; i++) {
+    var listElement = document.createElement('li');
+
+    listElement.textContent = ERRORS[i];
+    listElement.classList.add('error-' + i, 'errors');
+    errorsList.appendChild(listElement);
+  }
+
+  formWrap.insertBefore(fragmentErrors, inputHashTag.nextSibling);
+
+  var errorsListElements = document.querySelectorAll('.errors');
 
   /**
    * Кастомная валидация поля с хэш-тегом.
    */
   var inputHashTagCustomValidity = function () {
-    var inputHashTag = document.querySelector('.text__hashtags');
     var hashTagValue = inputHashTag.value;
     var separator = /\s+/;
     var hashTags = hashTagValue.split(separator);
-    var errorMessages = [];
     var error = false;
 
     inputHashTag.setCustomValidity('');
 
-    for (var i = 0; i < hashTags.length; i++) {
+    for (i = 0; i < hashTags.length; i++) {
       if (hashTags[i] === '') {
+        error = false;
+
+        for (i = 0; i < errorsListElements.length; i++) {
+          errorsListElements[i].style.color = 'lightgreen';
+        }
+
+        inputHashTag.classList.remove('hashtag-error');
+
         break;
       }
 
-      if (!hashTags[i].match(/#/)) {
-        errorMessages.push('Хэш-тег должен начинаться с символа - #.');
+      /**
+       * Хэш-тег должен начинаться с символа - #.
+       */
+      if (!hashTags[i].match(/^#/)) {
         error = true;
+        document.querySelector('.error-0').style.color = 'red';
+      } else {
+        document.querySelector('.error-0').style.color = 'lightgreen';
       }
 
+      /**
+       * Хэш-тег не может состоять только из одной решетки.
+       */
       if (hashTags[i] === '#') {
-        errorMessages.push('Хэш-тег не может состоять только из одной решетки.');
         error = true;
+        document.querySelector('.error-1').style.color = 'red';
+      } else {
+        document.querySelector('.error-1').style.color = 'lightgreen';
       }
 
-      if (hashTags[i].match(/#[\wа-яё]+#/)) {
-        errorMessages.push('Хэш-теги должны разделяться пробелами.');
+      /**
+       * Хэш-теги должны разделяться пробелами.
+       */
+      if (hashTags[i].match(/#[\wа-яё]*#/i)) {
         error = true;
+        document.querySelector('.error-2').style.color = 'red';
+      } else {
+        document.querySelector('.error-2').style.color = 'lightgreen';
       }
 
+      /**
+       * Один и тот же хэш-тег не может быть использован дважды.
+       */
       if (hashTags[i] === hashTags[i - 1]) {
-        errorMessages.push('Один и тот же хэш-тег не может быть использован дважды.');
         error = true;
+        document.querySelector('.error-3').style.color = 'red';
+      } else {
+        document.querySelector('.error-3').style.color = 'lightgreen';
       }
 
+      /**
+       * Нельзя указывать больше пяти хэш-тегов.
+       */
       if (hashTags.length > 5) {
-        errorMessages.push('Нельзя указывать больше пяти хэш-тегов.');
         error = true;
+        document.querySelector('.error-4').style.color = 'red';
+      } else {
+        document.querySelector('.error-4').style.color = 'lightgreen';
       }
 
+      /**
+       * Длина одного хэш-тега не должна превышать 20 символов (включая #).
+       */
       if (hashTags[i].length > 20) {
-        errorMessages.push('Длина одного хэш-тега не должна превышать 20 символов (включая #).');
         error = true;
+        document.querySelector('.error-5').style.color = 'red';
+      } else {
+        document.querySelector('.error-5').style.color = 'lightgreen';
       }
 
-      if (error === true) {
-        inputHashTag.setCustomValidity(errorMessages.join('. \n'));
-        break;
+      if (error) {
+        inputHashTag.setCustomValidity('Хэш-тег не соответствует требованиям.');
+        inputHashTag.classList.add('hashtag-error');
+      } else {
+        inputHashTag.classList.remove('hashtag-error');
       }
     }
   };
 
-  /**
-   * Обработчик клика на кнопку "Опубликовать" в форме загрузки фотографии.
-   * Производит валидацию хэш-тега.
-   * Если валидация пройдена отправляет данные на сервер.
-   */
-  var formSubmitClickHandler = function () {
-    inputHashTagCustomValidity();
-  };
+  inputHashTag.addEventListener('focus', function () {
+    errorsList.classList.remove('visually-hidden');
+  });
 
-  formSubmit.addEventListener('click', formSubmitClickHandler);
+  inputHashTag.addEventListener('blur', function () {
+    if (!inputHashTag.classList.contains('hashtag-error')) {
+      errorsList.classList.add('visually-hidden');
+    }
+  });
+
+  inputHashTag.addEventListener('keyup', function () {
+    inputHashTagCustomValidity();
+  });
 })();
