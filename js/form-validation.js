@@ -41,6 +41,8 @@
    * Кастомная валидация поля с хэш-тегом.
    */
   var inputHashTagCustomValidity = function () {
+    inputHashTag.value = inputHashTag.value.toLowerCase();
+
     var hashTagValue = inputHashTag.value;
     var separator = /\s+/;
     var hashTags = hashTagValue.split(separator);
@@ -84,7 +86,7 @@
       /**
        * Хэш-теги должны разделяться пробелами.
        */
-      if (hashTags[i].match(/#[\wа-яё]*#/i)) {
+      if (hashTags[i].match(/#[\wа-яё]*#/)) {
         error = true;
         document.querySelector('.error-2').style.color = 'red';
       } else {
