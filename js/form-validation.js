@@ -43,26 +43,39 @@
   var inputHashTagCustomValidity = function () {
     inputHashTag.value = inputHashTag.value.toLowerCase();
 
+    /**
+     * Разбиваем введеные пользователем хэш-теги по пробелу.
+     * Добавляем полученные элементы в массив.
+     */
     var hashTagValue = inputHashTag.value;
     var separator = /\s+/;
     var hashTags = hashTagValue.split(separator);
-    var error = false;
+
+    /**
+     * Удаляем пустые элементы в полученном массиве хэш-тегов.
+     */
+    if (hashTags[hashTags.length - 1] === '') {
+      hashTags = hashTags.slice(0, -1);
+    }
 
     inputHashTag.setCustomValidity('');
 
-    for (i = 0; i < hashTags.length; i++) {
-      if (hashTags[i] === '') {
-        error = false;
+    var error = false;
 
-        for (i = 0; i < errorsListElements.length; i++) {
-          errorsListElements[i].style.color = 'lightgreen';
-        }
+    /**
+     * Если массив пустой, то обнулить все ошибки.
+     */
+    if (hashTags.length === 0) {
+      error = false;
 
-        inputHashTag.classList.remove('hashtag-error');
-
-        break;
+      for (i = 0; i < errorsListElements.length; i++) {
+        errorsListElements[i].style.color = 'lightgreen';
       }
 
+      inputHashTag.classList.remove('hashtag-error');
+    }
+
+    for (i = 0; i < hashTags.length; i++) {
       /**
        * Хэш-тег должен начинаться с символа - #.
        */
@@ -96,7 +109,15 @@
       /**
        * Один и тот же хэш-тег не может быть использован дважды.
        */
-      if (hashTags[i] === hashTags[i - 1]) {
+      var count = 0;
+      var tag = hashTags.indexOf(hashTags[i]);
+
+      while (tag !== -1) {
+        count++;
+        tag = hashTags.indexOf(hashTags[i], tag + 1);
+      }
+
+      if (count > 1) {
         error = true;
         document.querySelector('.error-3').style.color = 'red';
       } else {
