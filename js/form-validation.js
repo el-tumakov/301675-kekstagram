@@ -44,12 +44,14 @@
    * Кастомная валидация поля с хэш-тегом.
    */
   var inputHashTagCustomValidity = function () {
-    var error0 = document.querySelector('.error-0');
-    var error1 = document.querySelector('.error-1');
-    var error2 = document.querySelector('.error-2');
-    var error3 = document.querySelector('.error-3');
-    var error4 = document.querySelector('.error-4');
-    var error5 = document.querySelector('.error-5');
+    var errors = [
+      document.querySelector('.error-0'),
+      document.querySelector('.error-1'),
+      document.querySelector('.error-2'),
+      document.querySelector('.error-3'),
+      document.querySelector('.error-4'),
+      document.querySelector('.error-5')
+    ];
 
     var error = false;
 
@@ -101,30 +103,8 @@
     }
 
     for (i = 0; i < hashTags.length; i++) {
-      var check0 = !hashTags[i].match(/^#/);
-      var check1 = hashTags[i] === '#';
-      var check2 = hashTags[i].match(/#[\wа-яё]*#/);
-      var check3 = count > MAX_SAME_HASHTAG;
-      var check4 = hashTags.length > MAX_HASHTAGS;
-      var check5 = hashTags[i].length > MAX_HASHTAG_SYMBOLS;
-
       /**
-       * Хэш-тег должен начинаться с символа - #.
-       */
-      checkError(error0, check0);
-
-      /**
-       * Хэш-тег не может состоять только из одной решетки.
-       */
-      checkError(error1, check1);
-
-      /**
-       * Хэш-теги должны разделяться пробелами.
-       */
-      checkError(error2, check2);
-
-      /**
-       * Один и тот же хэш-тег не может быть использован дважды.
+       * Подсчет одинаковых хэш-тегов в массиве.
        */
       var count = 0;
       var tag = hashTags.indexOf(hashTags[i]);
@@ -134,17 +114,21 @@
         tag = hashTags.indexOf(hashTags[i], tag + 1);
       }
 
-      checkError(error3, check3);
+      var checks = [
+        !hashTags[i].match(/^#/), // Хэш-тег должен начинаться с символа - #.
+        hashTags[i] === '#', // Хэш-тег не может состоять только из одной решетки.
+        hashTags[i].match(/#[\wа-яё]*#/), // Хэш-теги должны разделяться пробелами.
+        count > MAX_SAME_HASHTAG, // Один и тот же хэш-тег не может быть использован дважды.
+        hashTags.length > MAX_HASHTAGS, // Нельзя указывать больше пяти хэш-тегов.
+        hashTags[i].length > MAX_HASHTAG_SYMBOLS // Длина одного хэш-тега не должна превышать 20 символов (включая #).
+      ];
 
       /**
-       * Нельзя указывать больше пяти хэш-тегов.
+       * Проверка хэш-тегов на ошибки.
        */
-      checkError(error4, check4);
-
-      /**
-       * Длина одного хэш-тега не должна превышать 20 символов (включая #).
-       */
-      checkError(error5, check5);
+      for (var j = 0; j < errors.length; j++) {
+        checkError(errors[j], checks[j]);
+      }
 
       if (error) {
         inputHashTag.setCustomValidity('Хэш-тег не соответствует требованиям.');
