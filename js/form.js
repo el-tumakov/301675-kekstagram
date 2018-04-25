@@ -5,10 +5,13 @@
   var RESIZE_MAX = '100%';
   var ESC_KEYCODE = 27;
   var DEFAULT_TRANSFORM = 'scale(1)';
+  var URL = 'https://js.dump.academy/kekstagram';
 
   /**
    * Показ формы редактирования нового изображения.
    */
+  var form = document.querySelector('.img-upload__form');
+  var error = document.querySelector('.img-upload__message--error');
   var pictureEditor = document.querySelector('.img-upload__overlay');
   var pictureUploadInput = document.querySelector('#upload-file');
   var resizeValue = document.querySelector('.resize__control--value');
@@ -76,4 +79,25 @@
   };
 
   pictureEditorCancel.addEventListener('click', pictureEditorCancelClickHandler);
+
+  /**
+   * Колбек успешной загрузки данных на сервер.
+   */
+  var successUpload = function () {
+    closePictureEditor();
+  };
+
+  /**
+   * Колбек ошибки загрузки данных на сервер.
+   */
+  var errorUpload = function () {
+    closePictureEditor();
+    error.classList.remove('hidden');
+  };
+
+  form.addEventListener('submit', function (evt) {
+    window.backend.loadData(URL, successUpload, errorUpload, 'POST', new FormData(form));
+
+    evt.preventDefault();
+  });
 })();
