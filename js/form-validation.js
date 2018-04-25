@@ -9,6 +9,9 @@
     'Нельзя указывать больше пяти хэш-тегов.',
     'Длина одного хэш-тега не должна превышать 20 символов (включая #).'
   ];
+  var MAX_HASHTAGS = 5;
+  var MAX_HASHTAG_SYMBOLS = 20;
+  var MAX_SAME_HASHTAG = 1;
 
   var formWrap = document.querySelector('.text');
   var inputHashTag = document.querySelector('.text__hashtags');
@@ -41,6 +44,29 @@
    * Кастомная валидация поля с хэш-тегом.
    */
   var inputHashTagCustomValidity = function () {
+    var error0 = document.querySelector('.error-0');
+    var error1 = document.querySelector('.error-1');
+    var error2 = document.querySelector('.error-2');
+    var error3 = document.querySelector('.error-3');
+    var error4 = document.querySelector('.error-4');
+    var error5 = document.querySelector('.error-5');
+
+    var error = false;
+
+    /**
+     * Функция проверки хэш-тега на ошибку.
+     * @param {string} errorNumber - элемент ошибки в DOM, у которой будем менять цвет.
+     * @param {string} checkNumber - условие для проверки хэш-тега на ошибки.
+     */
+    var checkError = function (errorNumber, checkNumber) {
+      if (checkNumber) {
+        error = true;
+        errorNumber.style.color = 'red';
+      } else {
+        errorNumber.style.color = 'lightgreen';
+      }
+    };
+
     inputHashTag.value = inputHashTag.value.toLowerCase();
 
     /**
@@ -60,7 +86,6 @@
 
     inputHashTag.setCustomValidity('');
 
-    var error = false;
 
     /**
      * Если массив пустой, то обнулить все ошибки.
@@ -76,35 +101,27 @@
     }
 
     for (i = 0; i < hashTags.length; i++) {
+      var check0 = !hashTags[i].match(/^#/);
+      var check1 = hashTags[i] === '#';
+      var check2 = hashTags[i].match(/#[\wа-яё]*#/);
+      var check3 = count > MAX_SAME_HASHTAG;
+      var check4 = hashTags.length > MAX_HASHTAGS;
+      var check5 = hashTags[i].length > MAX_HASHTAG_SYMBOLS;
+
       /**
        * Хэш-тег должен начинаться с символа - #.
        */
-      if (!hashTags[i].match(/^#/)) {
-        error = true;
-        document.querySelector('.error-0').style.color = 'red';
-      } else {
-        document.querySelector('.error-0').style.color = 'lightgreen';
-      }
+      checkError(error0, check0);
 
       /**
        * Хэш-тег не может состоять только из одной решетки.
        */
-      if (hashTags[i] === '#') {
-        error = true;
-        document.querySelector('.error-1').style.color = 'red';
-      } else {
-        document.querySelector('.error-1').style.color = 'lightgreen';
-      }
+      checkError(error1, check1);
 
       /**
        * Хэш-теги должны разделяться пробелами.
        */
-      if (hashTags[i].match(/#[\wа-яё]*#/)) {
-        error = true;
-        document.querySelector('.error-2').style.color = 'red';
-      } else {
-        document.querySelector('.error-2').style.color = 'lightgreen';
-      }
+      checkError(error2, check2);
 
       /**
        * Один и тот же хэш-тег не может быть использован дважды.
@@ -117,32 +134,17 @@
         tag = hashTags.indexOf(hashTags[i], tag + 1);
       }
 
-      if (count > 1) {
-        error = true;
-        document.querySelector('.error-3').style.color = 'red';
-      } else {
-        document.querySelector('.error-3').style.color = 'lightgreen';
-      }
+      checkError(error3, check3);
 
       /**
        * Нельзя указывать больше пяти хэш-тегов.
        */
-      if (hashTags.length > 5) {
-        error = true;
-        document.querySelector('.error-4').style.color = 'red';
-      } else {
-        document.querySelector('.error-4').style.color = 'lightgreen';
-      }
+      checkError(error4, check4);
 
       /**
        * Длина одного хэш-тега не должна превышать 20 символов (включая #).
        */
-      if (hashTags[i].length > 20) {
-        error = true;
-        document.querySelector('.error-5').style.color = 'red';
-      } else {
-        document.querySelector('.error-5').style.color = 'lightgreen';
-      }
+      checkError(error5, check5);
 
       if (error) {
         inputHashTag.setCustomValidity('Хэш-тег не соответствует требованиям.');
