@@ -23,6 +23,8 @@
   var scalePin = document.querySelector('.scale__pin');
   var scaleValue = document.querySelector('.scale__value');
   var scaleLevel = document.querySelector('.scale__level');
+  var textHashtag = document.querySelector('.text__hashtags');
+  var textDescription = document.querySelector('.text__description');
 
   /**
    * Обработчик события при загрузке фотографии.
@@ -49,6 +51,7 @@
    */
   var closePictureEditor = function () {
     pictureUploadInput.value = '';
+    resizeValue.setAttribute('value', '');
     picturePreview.style = '';
     picturePreview.className = '';
     pictureEditor.classList.add('hidden');
@@ -56,6 +59,10 @@
     scalePin.style = '';
     scaleLevel.style = '';
     scale.classList.add('visually-hidden');
+    textHashtag.value = '';
+    textDescription.value = '';
+
+
     document.removeEventListener('keydown', pictureEditorKeydownHandler);
   };
 

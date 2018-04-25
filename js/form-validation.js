@@ -53,7 +53,14 @@
       document.querySelector('.error-5')
     ];
 
+    /**
+     * Обнуляем ошибки.
+     */
     var error = false;
+
+    for (i = 0; i < errors.length; i++) {
+      errors[i].style.color = 'lightgreen';
+    }
 
     /**
      * Функция проверки хэш-тега на ошибку.
@@ -64,7 +71,7 @@
       if (checkNumber) {
         error = true;
         errorNumber.style.color = 'red';
-      } else {
+      } else if (errorNumber.style.color !== 'red') {
         errorNumber.style.color = 'lightgreen';
       }
     };
@@ -87,7 +94,6 @@
     }
 
     inputHashTag.setCustomValidity('');
-
 
     /**
      * Если массив пустой, то обнулить все ошибки.
