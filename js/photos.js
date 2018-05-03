@@ -24,7 +24,7 @@
     for (var i = 0; i < pictures.length; i++) {
       pictureImgs[i].src = pictures[i].url;
       pictureLikes[i].textContent = pictures[i].likes;
-      pictureComments[i].textContent = pictures[i]  .comments.length;
+      pictureComments[i].textContent = pictures[i].comments.length;
     }
   };
 
@@ -61,8 +61,6 @@
     picturesDiv.appendChild(fragmentPhoto);
 
     renderPhoto(photos);
-
-    console.log(photos);
 
     /**
      * Добавление комментариев из массива данных на сайт.
@@ -112,6 +110,7 @@
         while (bigPictureCommentsList.firstChild) {
           bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
         }
+
         bigPictureCommentsList.appendChild(fragmentPictureComment);
         bigPictureSocial.textContent = photos[targetNumber].comments[0];
 
@@ -152,7 +151,6 @@
     };
 
     bigPictureCancel.addEventListener('click', bigPictureCancelClickHandler);
-
 
     /**
      * Фильтрация вывода фотографий на экран.
@@ -209,9 +207,9 @@
      * Выводит фотографии на экран в случайном порядке.
      */
     var filterRandomClickHandler = function () {
-      photos.sort(function (left, right) {
+      photos.sort(function () {
         return Math.random() - 0.5; // сдвигаем Math.random, чтобы диапазон значений был от -0.5 до 0.5.
-      })
+      });
 
       renderPhoto(photos);
     };
