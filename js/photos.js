@@ -1,8 +1,10 @@
 'use strict';
 
 (function () {
-  var MIN_AVATAR_NUMBER = 1;
-  var MAX_AVATAR_NUMBER = 6;
+  var AvatarNumber = {
+    MIN: 1,
+    MAX: 6
+  };
   var ESC_KEYCODE = 27;
   var URL = 'https://js.dump.academy/kekstagram/data';
 
@@ -37,7 +39,7 @@
     var commentary = templateComment.cloneNode(true);
     var bigPictureAvatar = commentary.querySelector('.social__picture');
 
-    bigPictureAvatar.src = 'img/avatar-' + window.utils.getRandomInt(MIN_AVATAR_NUMBER, MAX_AVATAR_NUMBER) + '.svg';
+    bigPictureAvatar.src = 'img/avatar-' + window.utils.getRandomInt(AvatarNumber.MIN, AvatarNumber.MAX) + '.svg';
     commentary.lastChild.textContent = commentaryes;
 
     return commentary;
@@ -177,18 +179,16 @@
     };
 
     /**
-     * Обработчик клика на фильтр рекомендуемых фотографий.
      * Выводит фотографии на экран в изначальном порядке.
      */
-    var filterRecommendClickHandler = function () {
+    var sortRecommend = function () {
       renderPhoto(photosOriginal);
     };
 
     /**
-     * Обработчик клика на фильтр популярных фотографий.
      * Выводит фотографии на экран в порядке убывания количества лайков.
      */
-    var filterPopularClickHandler = function () {
+    var sortPopular = function () {
       photos.sort(function (left, right) {
         if (left.likes < right.likes) {
           return 1;
@@ -203,10 +203,9 @@
     };
 
     /**
-     * Обработчик клика на фильтр случайных фотографий.
      * Выводит фотографии на экран в случайном порядке.
      */
-    var filterRandomClickHandler = function () {
+    var sortRandom = function () {
       photos.sort(function () {
         return Math.random() - 0.5; // сдвигаем Math.random, чтобы диапазон значений был от -0.5 до 0.5.
       });
@@ -214,7 +213,10 @@
       renderPhoto(photos);
     };
 
-    var filterDiscussedClickHandler = function () {
+    /**
+     * Выводит фотографии на экран в порядке убывания количества комментариев.
+     */
+    var sortDiscussed = function () {
       photos.sort(function (left, right) {
         if (left.comments.length < right.comments.length) {
           return 1;
@@ -226,6 +228,22 @@
       });
 
       renderPhoto(photos);
+    };
+
+    var filterRecommendClickHandler = function () {
+      window.utils.debounce(sortRecommend);
+    };
+
+    var filterPopularClickHandler = function () {
+      window.utils.debounce(sortPopular);
+    };
+
+    var filterDiscussedClickHandler = function () {
+      window.utils.debounce(sortDiscussed);
+    };
+
+    var filterRandomClickHandler = function () {
+      window.utils.debounce(sortRandom);
     };
 
     for (i = 0; i < filterButtons.length; i++) {

@@ -9,9 +9,11 @@
     'Нельзя указывать больше пяти хэш-тегов.',
     'Длина одного хэш-тега не должна превышать 20 символов (включая #).'
   ];
-  var MAX_HASHTAGS = 5;
-  var MAX_HASHTAG_SYMBOLS = 20;
-  var MAX_SAME_HASHTAG = 1;
+  var Hashtags = {
+    MAX: 5,
+    MAX_SYMBOLS: 20,
+    MAX_SAME: 1
+  };
 
   var formWrap = document.querySelector('.text');
   var inputHashTag = document.querySelector('.text__hashtags');
@@ -124,9 +126,9 @@
         !hashTags[i].match(/^#/), // Хэш-тег должен начинаться с символа - #.
         hashTags[i] === '#', // Хэш-тег не может состоять только из одной решетки.
         hashTags[i].match(/#[\wа-яё]*#/), // Хэш-теги должны разделяться пробелами.
-        count > MAX_SAME_HASHTAG, // Один и тот же хэш-тег не может быть использован дважды.
-        hashTags.length > MAX_HASHTAGS, // Нельзя указывать больше пяти хэш-тегов.
-        hashTags[i].length > MAX_HASHTAG_SYMBOLS // Длина одного хэш-тега не должна превышать 20 символов (включая #).
+        count > Hashtags.MAX_SAME, // Один и тот же хэш-тег не может быть использован дважды.
+        hashTags.length > Hashtags.MAX, // Нельзя указывать больше пяти хэш-тегов.
+        hashTags[i].length > Hashtags.MAX_SYMBOLS // Длина одного хэш-тега не должна превышать 20 символов (включая #).
       ];
 
       /**

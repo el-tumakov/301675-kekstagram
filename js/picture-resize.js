@@ -1,9 +1,11 @@
 'use strict';
 
 (function () {
-  var RESIZE_MAX = '100%';
-  var RESIZE_MIN = '25%';
-  var RESIZE_STEP = 25;
+  var Resize = {
+    MAX: '100%',
+    MIN: '25%',
+    STEP: 25
+  };
   var SCALE_STEP = 0.25;
 
   /**
@@ -28,15 +30,15 @@
     var resizeScaleNumber = Number(picturePreview.style.transform.replace(/[^.0-9]/gim, ''));
 
     if (minus) {
-      if (!(resizeValue.value === RESIZE_MIN)) {
-        resizeValue.setAttribute('value', resizeValueNumber - RESIZE_STEP + '%');
+      if (!(resizeValue.value === Resize.MIN)) {
+        resizeValue.setAttribute('value', resizeValueNumber - Resize.STEP + '%');
         picturePreview.style.transform = 'scale(' + (resizeScaleNumber - SCALE_STEP) + ')';
       }
     }
 
     if (plus) {
-      if (!(resizeValue.value === RESIZE_MAX)) {
-        resizeValue.setAttribute('value', resizeValueNumber + RESIZE_STEP + '%');
+      if (!(resizeValue.value === Resize.MAX)) {
+        resizeValue.setAttribute('value', resizeValueNumber + Resize.STEP + '%');
         picturePreview.style.transform = 'scale(' + (resizeScaleNumber + SCALE_STEP) + ')';
       }
     }
