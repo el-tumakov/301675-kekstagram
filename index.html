@@ -19,9 +19,10 @@
       <h2 class="img-filters__title visually-hidden">Фильтр фотографий</h2>
 
       <form class="img-filters__form" action="index.html" method="get" autocomplete="off">
-        <button type=button class="img-filters__button img-filters__button--active" id="filter-popular">Популярные</button>
-        <button type=button class="img-filters__button" id="filter-new">Новые</button>
+        <button type=button class="img-filters__button img-filters__button--active" id="filter-recommend">Рекомендуемые</button>
+        <button type=button class="img-filters__button" id="filter-popular">Популярные</button>
         <button type=button class="img-filters__button" id="filter-discussed">Обсуждаемые</button>
+        <button type=button class="img-filters__button" id="filter-random">Случайные</button>
       </form>
     </section>
 
@@ -151,14 +152,6 @@
           <div class="social__comment-count">5 из <span class="comments-count">125</span> комментариев</div>
           <div class="social__comment-loadmore">Загрузить еще</div>
           <ul class="social__comments">
-            <li class="social__comment social__comment--text">
-              <img class="social__picture" src="img/avatar-4.svg" alt="Аватар комментатора фотографии" width="35" height="35">
-              Мега фото! Просто обалдеть. Как вам так удалось?
-            </li>
-            <li class="social__comment social__comment--text">
-              <img class="social__picture" src="img/avatar-3.svg" alt="Аватар комментатора фотографии" width="35" height="35">
-               Да это фоташоп!!!!!!!!
-            </li>
           </ul>
           <div class="social__footer">
             <img class="social__picture" src="img/avatar-6.svg" alt="Аватар комментатора фотографии" width="35" height="35">
@@ -204,6 +197,12 @@
         <span class="picture__stat picture__stat--likes"></span>
       </p>
     </a>
+  </template>
+
+  <template id="comment">
+    <li class="social__comment social__comment--text">
+      <img class="social__picture" src="img/avatar-4.svg" alt="Аватар комментатора фотографии" width="35" height="35">
+    </li>
   </template>
 
   <script src="js/backend.js"></script>

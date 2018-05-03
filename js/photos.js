@@ -7,33 +7,31 @@
   var URL = 'https://js.dump.academy/kekstagram/data';
 
   var templatePhoto = document.querySelector('#picture').content.querySelector('.picture__link');
-  var templateComment = document.querySelector('.social__comment');
+  var templateComment = document.querySelector('#comment').content.querySelector('.social__comment');
   var picturesDiv = document.querySelector('.pictures');
+  var imgFilters = document.querySelector('.img-filters');
   var fragmentPhoto = document.createDocumentFragment();
 
   /**
-   * Функция генерирования фотографии из массива.
+   * Функция отрисовки данных о фотографиях.
    * @param {Array} pictures - массив объектов с данными о фотографиях.
-   * @return {string} - возвращаем DOM ноду маленькой фотографии.
    */
   var renderPhoto = function (pictures) {
-    var picture = templatePhoto.cloneNode(true);
+    var pictureImgs = document.querySelectorAll('.picture__img');
+    var pictureLikes = document.querySelectorAll('.picture__stat--likes');
+    var pictureComments = document.querySelectorAll('.picture__stat--comments');
 
-    var pictureImg = picture.querySelector('.picture__img');
-    var pictureLikes = picture.querySelector('.picture__stat--likes');
-    var pictureComments = picture.querySelector('.picture__stat--comments');
-
-    pictureImg.src = pictures.url;
-    pictureLikes.textContent = pictures.likes;
-    pictureComments.textContent = pictures.comments;
-
-    return picture;
+    for (var i = 0; i < pictures.length; i++) {
+      pictureImgs[i].src = pictures[i].url;
+      pictureLikes[i].textContent = pictures[i].likes;
+      pictureComments[i].textContent = pictures[i]  .comments.length;
+    }
   };
 
   /**
    * Функция генерации ноды комментария.
-   * @param {Array} commentaryes - двумерный массив с комментариями.
-   * @return {Array} - возвращаем DOM ноду комментария.
+   * @param {string} commentaryes - комментарий.
+   * @return {string} - возвращаем DOM ноду комментария.
    */
   var renderComment = function (commentaryes) {
     var commentary = templateComment.cloneNode(true);
@@ -51,15 +49,20 @@
    */
   var successLoad = function (data) {
     var photos = data;
+    imgFilters.classList.remove('img-filters--inactive');
 
     /**
      * Блок добавления маленьких фотографий на главную.
      */
     for (var i = 0; i < photos.length; i++) {
-      fragmentPhoto.appendChild(renderPhoto(photos[i]));
+      fragmentPhoto.appendChild(templatePhoto.cloneNode(true));
     }
 
     picturesDiv.appendChild(fragmentPhoto);
+
+    renderPhoto(photos);
+
+    console.log(photos);
 
     /**
      * Добавление комментариев из массива данных на сайт.
@@ -89,9 +92,8 @@
       if (target.className === 'picture__img') {
         bigPicture.classList.remove('hidden');
         bigPictureImg.src = target.src;
-        bigPictureCommentsCount.textContent = photos[targetNumber + 1].comments.length - 1; // 1 комментарий отводится под описание фотографии
-        bigPictureLike.textContent = photos[targetNumber + 1].likes;
-        bigPictureSocial.textContent = photos[targetNumber + 1].comments[0];
+        bigPictureCommentsCount.textContent = photos[targetNumber].comments.length - 1; // 1 комментарий отводится под описание фотографии
+        bigPictureLike.textContent = photos[targetNumber].likes;
 
         socialCommentsCount.classList.add('visually-hidden');
         socialCommentsLoadmore.classList.add('visually-hidden');
@@ -100,18 +102,18 @@
          * Генерирование комментариев для выбранной фотографии.
          * Счетчик ничинается с единицы, потому что первый комментарий в массив отдходит под описание фотографии.
          */
-        for (i = 1; i < photos[targetNumber + 1].comments.length; i++) {
-          fragmentPictureComment.appendChild(renderComment(photos[targetNumber + 1].comments[i]));
+        for (i = 1; i < photos[targetNumber].comments.length; i++) {
+          fragmentPictureComment.appendChild(renderComment(photos[targetNumber].comments[i]));
         }
 
         /**
-         * Удаление стандартных комментариев и добавление сгенерированных в DOM.
+         * Удаление старых и добавление сгенерированных комментариев в DOM.
          */
         while (bigPictureCommentsList.firstChild) {
           bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
         }
-
         bigPictureCommentsList.appendChild(fragmentPictureComment);
+        bigPictureSocial.textContent = photos[targetNumber].comments[0];
 
         bodyElement.classList.add('modal-open');
 
@@ -150,6 +152,92 @@
     };
 
     bigPictureCancel.addEventListener('click', bigPictureCancelClickHandler);
+
+
+    /**
+     * Фильтрация вывода фотографий на экран.
+     */
+    var filterButtons = document.querySelectorAll('.img-filters__button');
+    var filterRecommend = document.querySelector('#filter-recommend');
+    var filterPopular = document.querySelector('#filter-popular');
+    var filterDiscussed = document.querySelector('#filter-discussed');
+    var filterRandom = document.querySelector('#filter-random');
+    var photosOriginal = photos.slice();
+
+    /**
+     * Обработчик клика на кнопку фильтра фотографий.
+     * Меняет активный фильтр.
+     */
+    var filterButtonClickHandler = function () {
+      var target = event.target;
+      var filterButtonActive = document.querySelector('.img-filters__button--active');
+
+      if (target !== filterButtonActive) {
+        filterButtonActive.classList.remove('img-filters__button--active');
+        target.classList.add('img-filters__button--active');
+      }
+    };
+
+    /**
+     * Обработчик клика на фильтр рекомендуемых фотографий.
+     * Выводит фотографии на экран в изначальном порядке.
+     */
+    var filterRecommendClickHandler = function () {
+      renderPhoto(photosOriginal);
+    };
+
+    /**
+     * Обработчик клика на фильтр популярных фотографий.
+     * Выводит фотографии на экран в порядке убывания количества лайков.
+     */
+    var filterPopularClickHandler = function () {
+      photos.sort(function (left, right) {
+        if (left.likes < right.likes) {
+          return 1;
+        } else if (left.likes > right.likes) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+
+      renderPhoto(photos);
+    };
+
+    /**
+     * Обработчик клика на фильтр случайных фотографий.
+     * Выводит фотографии на экран в случайном порядке.
+     */
+    var filterRandomClickHandler = function () {
+      photos.sort(function (left, right) {
+        return Math.random() - 0.5; // сдвигаем Math.random, чтобы диапазон значений был от -0.5 до 0.5.
+      })
+
+      renderPhoto(photos);
+    };
+
+    var filterDiscussedClickHandler = function () {
+      photos.sort(function (left, right) {
+        if (left.comments.length < right.comments.length) {
+          return 1;
+        } else if (left.comments.length > right.comments.length) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+
+      renderPhoto(photos);
+    };
+
+    for (i = 0; i < filterButtons.length; i++) {
+      filterButtons[i].addEventListener('click', filterButtonClickHandler);
+    }
+
+    filterRecommend.addEventListener('click', filterRecommendClickHandler);
+    filterPopular.addEventListener('click', filterPopularClickHandler);
+    filterDiscussed.addEventListener('click', filterDiscussedClickHandler);
+    filterRandom.addEventListener('click', filterRandomClickHandler);
   };
 
   window.backend.loadData(URL, successLoad, window.backend.errorLoad, 'GET');
