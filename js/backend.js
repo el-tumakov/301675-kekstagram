@@ -58,6 +58,8 @@
     errorLoad: function (errorMassage) {
       var node = document.createElement('div');
 
+      node.classList.add('error-message');
+
       node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
       node.style.position = 'absolute';
       node.style.left = 0;
@@ -66,6 +68,16 @@
 
       node.textContent = errorMassage;
       document.body.insertAdjacentElement('afterbegin', node);
+    },
+
+    /**
+     * Удаление сообщения об ошибке.
+     */
+    errorClear: function () {
+      var parentNode = document.querySelector('body');
+      var nodeError = document.querySelector('.error-message');
+
+      parentNode.removeChild(nodeError);
     }
   };
 })();
