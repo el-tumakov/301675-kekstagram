@@ -1,6 +1,10 @@
 'use strict';
 
 (function () {
+  var DEBOUNCE_INTERVAL = 500; // ms
+
+  var lastTimeout;
+
   window.utils = {
     /**
      * Функция нахождения рандомного элемента в массиве.
@@ -28,6 +32,17 @@
      */
     coinToss: function () {
       return Math.floor(Math.random() * 2);
+    },
+
+    /**
+     * Функция устранения "дребезга".
+     * @param {callback} fun - функция, которая будет выполняться по истечению таймаута.
+     */
+    debounce: function (fun) {
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
     }
   };
 })();
