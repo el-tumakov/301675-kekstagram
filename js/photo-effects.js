@@ -28,7 +28,7 @@
    * Функция расчетов уровня насыщенности эффектов.
    */
   var getEffectLevel = function () {
-    var scaleValueNumber = scaleLevel.style.width.replace(/%/, '');
+    var scaleValueNumber = Number(scaleLevel.style.width.replace(/%/, ''));
     var filterGrayscale = (scaleValueNumber / MAX_FILTER_VALUE_PERCENT);
     var filterSepia = (scaleValueNumber / MAX_FILTER_VALUE_PERCENT);
     var filterBlur = (scaleValueNumber * BLUR_MAX_VALUE / MAX_FILTER_VALUE_PERCENT);
