@@ -61,7 +61,7 @@
     scale.classList.add('visually-hidden');
     textHashtag.value = '';
     textDescription.value = '';
-
+    inputHashTag.style = '';
 
     document.removeEventListener('keydown', pictureEditorKeydownHandler);
   };
