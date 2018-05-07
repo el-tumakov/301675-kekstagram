@@ -34,23 +34,26 @@
     var filterBlur = (scaleValueNumber * BLUR_MAX_VALUE / MAX_FILTER_VALUE_PERCENT);
     var filterBrightness = (scaleValueNumber * BRIGHTNESS_MAX_VALUE / MAX_FILTER_VALUE_PERCENT + BRIGHTNESS_STEP);
 
-    if (picturePreview.className === 'effects__preview--none' || picturePreview.className === '') {
-      picturePreview.style.filter = '';
-    }
-    if (picturePreview.className === 'effects__preview--chrome') {
-      picturePreview.style.filter = 'grayscale(' + filterGrayscale + ')';
-    }
-    if (picturePreview.className === 'effects__preview--sepia') {
-      picturePreview.style.filter = 'sepia(' + filterSepia + ')';
-    }
-    if (picturePreview.className === 'effects__preview--marvin') {
-      picturePreview.style.filter = 'invert(' + scaleValueNumber + '%)';
-    }
-    if (picturePreview.className === 'effects__preview--phobos') {
-      picturePreview.style.filter = 'blur(' + filterBlur + 'px)';
-    }
-    if (picturePreview.className === 'effects__preview--heat') {
-      picturePreview.style.filter = 'brightness(' + filterBrightness + ')';
+    switch (picturePreview.className) {
+      case '':
+      case 'effects__preview--none':
+        picturePreview.style.filter = '';
+        break;
+      case 'effects__preview--chrome':
+        picturePreview.style.filter = 'grayscale(' + filterGrayscale + ')';
+        break;
+      case 'effects__preview--sepia':
+        picturePreview.style.filter = 'sepia(' + filterSepia + ')';
+        break;
+      case 'effects__preview--marvin':
+        picturePreview.style.filter = 'invert(' + scaleValueNumber + '%)';
+        break;
+      case 'effects__preview--phobos':
+        picturePreview.style.filter = 'blur(' + filterBlur + 'px)';
+        break;
+      case 'effects__preview--heat':
+        picturePreview.style.filter = 'brightness(' + filterBrightness + ')';
+        break;
     }
 
     scaleValue.setAttribute('value', scaleValueNumber);
