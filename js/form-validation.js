@@ -25,6 +25,7 @@
   var checkError = function (errorNumber, checkNumber) {
     if (checkNumber) {
       inputHashTag.setCustomValidity(errorNumber);
+      inputHashTag.setAttribute('style', 'border: 2px solid red');
     }
   };
 
@@ -53,6 +54,7 @@
     }
 
     inputHashTag.setCustomValidity('');
+    inputHashTag.style = '';
 
     for (var i = 0; i < hashTags.length; i++) {
       /**
@@ -87,7 +89,7 @@
     }
   };
 
-  inputHashTag.addEventListener('change', function () {
+  inputHashTag.addEventListener('keyup', function () {
     inputHashTagCustomValidity();
   });
 })();
