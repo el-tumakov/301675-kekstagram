@@ -83,9 +83,10 @@
     /**
      * Обработчик клика на маленькую фотографию.
      * Открывает большую фотографию и присваивает данных о фото из массива photos.
+     * @param {Object} evt - event.
      */
-    var picturesDivClickHandler = function () {
-      var target = event.target;
+    var picturesDivClickHandler = function (evt) {
+      var target = evt.target;
       var parentTarget = target.parentNode;
       var targetNumber = Array.prototype.indexOf.call(picturesLink, parentTarget);
 
@@ -167,9 +168,10 @@
     /**
      * Обработчик клика на кнопку фильтра фотографий.
      * Меняет активный фильтр.
+     * @param {Object} evt - event.
      */
-    var filterButtonClickHandler = function () {
-      var target = event.target;
+    var filterButtonClickHandler = function (evt) {
+      var target = evt.target;
       var filterButtonActive = document.querySelector('.img-filters__button--active');
 
       if (target !== filterButtonActive) {
@@ -194,9 +196,9 @@
           return 1;
         } else if (left.likes > right.likes) {
           return -1;
-        } else {
-          return 0;
         }
+
+        return 0;
       });
 
       renderPhoto(photos);
@@ -222,9 +224,9 @@
           return 1;
         } else if (left.comments.length > right.comments.length) {
           return -1;
-        } else {
-          return 0;
         }
+
+        return 0;
       });
 
       renderPhoto(photos);

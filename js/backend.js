@@ -77,7 +77,9 @@
       var parentNode = document.querySelector('body');
       var nodeError = document.querySelector('.error-message');
 
-      parentNode.removeChild(nodeError);
+      if (nodeError) {
+        parentNode.removeChild(nodeError);
+      }
     }
   };
 })();
