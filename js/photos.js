@@ -196,9 +196,9 @@
           return 1;
         } else if (left.likes > right.likes) {
           return -1;
-        } else {
-          return 0;
         }
+
+        return 0;
       });
 
       renderPhoto(photos);
@@ -224,9 +224,9 @@
           return 1;
         } else if (left.comments.length > right.comments.length) {
           return -1;
-        } else {
-          return 0;
         }
+
+        return 0;
       });
 
       renderPhoto(photos);
